@@ -1,500 +1,494 @@
-```javascript
 const state = {
   leads: JSON.parse(localStorage.getItem("ach_leads") || "[]"),
-  settings: JSON.parse(
-    localStorage.getItem("ach_settings") ||
-    JSON.stringify({
-      min: 250,
-      standard: 500,
-      custom: 1000,
-      daily: 20
-    })
-  )
+  settings: JSON.parse(localStorage.getItem("ach_settings") || "{}")
 };
-
 
 const $ = id => document.getElementById(id);
 
-
-function esc(value) {
-  return String(value ?? "").replace(
-    /[&<>"']/g,
-    m => ({
-      "&": "&amp;",
-      "<": "&lt;",
-      ">": "&gt;",
-      '"': "&quot;",
-      "'": "&#039;"
-    }[m])
-  );
+function esc(s) {
+  return String(s ?? "").replace(/[&<>"']/g, m => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#039;"
+  }[m]));
 }
 
-
-function saveLeads() {
-  localStorage.setItem(
-    "ach_leads",
-    JSON.stringify(state.leads)
-  );
-}
-
-
-function saveSettings() {
-  localStorage.setItem(
-    "ach_settings",
-    JSON.stringify(state.settings)
-  );
-}
-
-
-/* -----------------------------
+/* =========================
    NAVIGATION
------------------------------ */
+========================= */
 
-document.querySelectorAll("nav button").forEach(button => {
+document.querySelectorAll("nav button").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll("nav button").forEach(x =>
+      x.classList.remove("active")
+    );
 
-  button.onclick = () => {
+    document.querySelectorAll(".page").forEach(x =>
+      x.classList.remove("active")
+    );
 
-    document
-      .querySelectorAll("nav button")
-      .forEach(x => x.classList.remove("active"));
+    btn.classList.add("active");
 
-    document
-      .querySelectorAll(".page")
-      .forEach(x => x.classList.remove("active"));
+    const page = $(btn.dataset.page);
+    if (page) page.classList.add("active");
 
-    button.classList.add("active");
-
-    $(button.dataset.page).classList.add("active");
-
-    $("title").textContent = button.textContent.trim();
-  };
-
+    const title = $("title");
+    if (title) title.textContent = btn.textContent.trim();
+  });
 });
 
-
-
-/* -----------------------------
-   ADD LEAD
------------------------------ */
+/* =========================
+   MODAL
+========================= */
 
 function openModal() {
-  $("modal").classList.add("show");
+  const modal = $("modal");
+  if (modal) modal.classList.add("show");
 }
-
 
 function closeModal() {
-  $("modal").classList.remove("show");
+  const modal = $("modal");
+  if (modal) modal.classList.remove("show");
 }
 
-
-$("add").onclick = openModal;
-
-document.querySelector(".add").onclick = openModal;
-
-$("close").onclick = closeModal;
-
-
-$("form").onsubmit = event => {
-
-  event.preventDefault();
-
-  const lead = {
-    id: crypto.randomUUID
-      ? crypto.randomUUID()
-      : Date.now().toString(),
-
-    name: $("business").value.trim(),
-
-    location:
-      $("location").value.trim() || "Unknown",
-
-    web:
-      $("website").value.trim() || "—",
-
-    score:
-      Number($("score").value),
-
-    value:
-      Number($("potential").value) ||
-      state.settings.standard,
-
-    source: "manual",
-
-    status: "New",
-
-    createdAt: new Date().toISOString()
-  };
-
-
-  state.leads.unshift(lead);
-
-  saveLeads();
-
-  closeModal();
-
-  event.target.reset();
-
-  $("potential").value = state.settings.standard;
-
-  render();
-};
-
-
-
-/* -----------------------------
-   DISCOVERY MODAL
------------------------------ */
-
-function openDiscovery() {
-  $("discoverModal").classList.add("show");
+if ($("add")) {
+  $("add").addEventListener("click", openModal);
 }
 
-
-function closeDiscovery() {
-  $("discoverModal").classList.remove("show");
+if ($("close")) {
+  $("close").addEventListener("click", closeModal);
 }
 
+document.querySelectorAll(".add").forEach(btn => {
+  btn.addEventListener("click", openModal);
+});
 
-$("discoverBtn").onclick = openDiscovery;
+/* =========================
+   ADD LEAD
+========================= */
 
-$("discoverBtn2").onclick = openDiscovery;
+if ($("form")) {
+  $("form").addEventListener("submit", e => {
+    e.preventDefault();
 
-$("discoverClose").onclick = closeDiscovery;
+    const name = $("business")?.value.trim();
+    const web = $("website")?.value.trim() || "—";
+    const score = Number($("score")?.value || 0);
+    const value = Number($("potential")?.value || 0);
 
+    if (!name) return;
 
+    state.leads.push({
+      id: crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(),
+      name,
+      web,
+      score,
+      value,
+      status: score >= 75 ? "Hot" : score >= 55 ? "Warm" : "Cold",
+      source: "Manual"
+    });
 
-/* -----------------------------
-   DISCOVER LEADS
------------------------------ */
+    saveLeads();
 
-$("discoverForm").onsubmit = async event => {
+    closeModal();
 
-  event.preventDefault();
+    e.target.reset();
 
-  const niche =
-    $("discoverNiche").value.trim();
+    if ($("potential")) {
+      $("potential").value = 500;
+    }
 
-  const location =
-    $("discoverLocation").value.trim();
+    render();
+  });
+}
 
-  const limit =
-    Number($("discoverLimit").value) || 10;
+/* =========================
+   SAVE
+========================= */
 
+function saveLeads() {
+  localStorage.setItem("ach_leads", JSON.stringify(state.leads));
+}
 
-  const results = $("discoverResults");
+if ($("save")) {
+  $("save").addEventListener("click", () => {
+    const inputs = document.querySelectorAll(".settings input");
 
-  results.innerHTML = `
-    <div class="discoverLoading">
-      Searching legitimate public business data...
+    state.settings = {
+      minimum: inputs[0]?.value || 250,
+      standard: inputs[1]?.value || 500,
+      custom: inputs[2]?.value || 1000,
+      daily: inputs[3]?.value || 20
+    };
+
+    localStorage.setItem(
+      "ach_settings",
+      JSON.stringify(state.settings)
+    );
+
+    alert("Settings saved.");
+  });
+}
+
+/* =========================
+   DISCOVERY BUTTON
+   Creates itself so old HTML
+   also keeps working.
+========================= */
+
+function createDiscoveryUI() {
+
+  if ($("discoverBtn")) return;
+
+  const dashboard = $("dashboard");
+
+  if (!dashboard) return;
+
+  const box = document.createElement("div");
+
+  box.className = "card";
+  box.style.marginTop = "20px";
+
+  box.innerHTML = `
+    <div class="cardhead">
+      <div>
+        <h3>Lead Discovery</h3>
+        <small>FREE PUBLIC BUSINESS DATA</small>
+      </div>
+      <button id="discoverBtn">Find New Leads</button>
+    </div>
+
+    <p class="muted">
+      Search legitimate public business listings and add suitable prospects
+      to your pipeline.
+    </p>
+
+    <div id="discoveryForm" style="display:none;margin-top:18px">
+
+      <input
+        id="discoveryNiche"
+        placeholder="Business type e.g. dentist"
+        style="width:100%;padding:11px;margin-bottom:10px;background:#080b10;color:#fff;border:1px solid #28313d;border-radius:8px"
+      >
+
+      <input
+        id="discoveryLocation"
+        placeholder="Location e.g. Los Angeles, USA"
+        style="width:100%;padding:11px;margin-bottom:10px;background:#080b10;color:#fff;border:1px solid #28313d;border-radius:8px"
+      >
+
+      <select
+        id="discoveryLimit"
+        style="width:100%;padding:11px;margin-bottom:10px;background:#080b10;color:#fff;border:1px solid #28313d;border-radius:8px"
+      >
+        <option value="5">5 prospects</option>
+        <option value="10">10 prospects</option>
+        <option value="15">15 prospects</option>
+      </select>
+
+      <button id="runDiscovery">
+        Search Prospects
+      </button>
+
+      <div id="discoveryStatus" style="margin-top:12px"></div>
+
+      <div id="discoveryResults" style="margin-top:15px"></div>
+
     </div>
   `;
 
+  dashboard.appendChild(box);
+
+  $("discoverBtn").addEventListener("click", () => {
+    const form = $("discoveryForm");
+
+    form.style.display =
+      form.style.display === "none" ? "block" : "none";
+  });
+
+  $("runDiscovery").addEventListener("click", discoverLeads);
+}
+
+/* =========================
+   DISCOVER LEADS
+========================= */
+
+async function discoverLeads() {
+
+  const niche = $("discoveryNiche")?.value.trim();
+  const location = $("discoveryLocation")?.value.trim();
+  const limit = Number($("discoveryLimit")?.value || 5);
+
+  const status = $("discoveryStatus");
+  const results = $("discoveryResults");
+
+  if (!niche || !location) {
+    if (status) {
+      status.innerHTML =
+        `<div class="warning">Enter business type and location.</div>`;
+    }
+    return;
+  }
+
+  if (status) {
+    status.innerHTML = "Searching public business listings...";
+  }
+
+  if (results) {
+    results.innerHTML = "";
+  }
 
   try {
 
-    const response = await fetch(
-      "./api/discover",
-      {
-        method: "POST",
-
-        headers: {
-          "Content-Type": "application/json"
-        },
-
-        body: JSON.stringify({
-          niche,
-          location,
-          limit
-        })
-      }
-    );
-
+    const response = await fetch("./api/discover", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        niche,
+        location,
+        limit
+      })
+    });
 
     const data = await response.json();
 
-
     if (!response.ok) {
-      throw new Error(
-        data.error ||
-        "Lead discovery failed."
-      );
+      throw new Error(data.error || "Discovery failed.");
     }
 
+    const leads = data.leads || [];
 
-    if (!Array.isArray(data.leads) || !data.leads.length) {
+    if (!leads.length) {
 
-      results.innerHTML = `
-        <div class="empty">
-          No suitable prospects found.
-          Try another niche or location.
-        </div>
-      `;
+      if (status) {
+        status.innerHTML =
+          `<div class="warning">
+            No suitable prospects found. Try another niche or location.
+          </div>`;
+      }
 
       return;
     }
 
+    if (status) {
+      status.innerHTML =
+        `<div class="success">
+          Found ${leads.length} prospects.
+        </div>`;
+    }
 
-    results.innerHTML = `
-
-      <div class="discoveryTop">
-
-        <b>
-          ${data.leads.length} prospects found
-        </b>
-
-        <button id="addAllDiscovered">
-          Add All
-        </button>
-
-      </div>
-
-
-      <div class="discoveryList">
-
-        ${data.leads.map((lead, index) => `
-
-          <div
-            class="discoveryItem"
-            data-index="${index}"
-          >
-
-            <div>
-
-              <strong>
-                ${esc(lead.name)}
-              </strong>
-
-              <small>
-                ${esc(lead.location || "")}
-              </small>
-
-              <small>
-                ${esc(lead.website || "No website found")}
-              </small>
-
-            </div>
-
-
-            <div class="discoveryScore">
-
-              <b>
-                ${lead.score}/100
-              </b>
-
-              <span>
-                ${lead.status}
-              </span>
-
-            </div>
-
-
-            <button
-              class="addDiscovered"
-              data-index="${index}"
-            >
-              Add
-            </button>
-
-          </div>
-
-        `).join("")}
-
-      </div>
-
-      <small class="sourceNote">
-        Data source: OpenStreetMap contributors.
-      </small>
-    `;
-
-
-    document
-      .querySelectorAll(".addDiscovered")
-      .forEach(button => {
-
-        button.onclick = () => {
-
-          const lead =
-            data.leads[
-              Number(button.dataset.index)
-            ];
-
-          addDiscoveredLead(lead);
-
-          button.textContent = "Added";
-
-          button.disabled = true;
-        };
-
-      });
-
-
-    $("addAllDiscovered").onclick = () => {
-
-      data.leads.forEach(addDiscoveredLead);
-
-      render();
-
-      $("addAllDiscovered").textContent =
-        "Added";
-
-      $("addAllDiscovered").disabled =
-        true;
-
-      document
-        .querySelectorAll(".addDiscovered")
-        .forEach(button => {
-
-          button.textContent = "Added";
-
-          button.disabled = true;
-
-        });
-
-    };
-
+    renderDiscoveryResults(leads);
 
   } catch (error) {
 
-    results.innerHTML = `
-      <div class="errorBox">
-        ${esc(error.message)}
-      </div>
-    `;
+    console.error(error);
 
+    if (status) {
+      status.innerHTML =
+        `<div class="warning">
+          Error: ${esc(error.message)}
+        </div>`;
+    }
   }
+}
 
-};
+/* =========================
+   DISCOVERY RESULTS
+========================= */
 
+function renderDiscoveryResults(leads) {
 
+  const results = $("discoveryResults");
 
-/* -----------------------------
+  if (!results) return;
+
+  results.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <b>New prospects</b>
+      <button id="addAllDiscovered">Add All</button>
+    </div>
+
+    ${leads.map((lead, index) => `
+      <div
+        class="card"
+        style="margin-bottom:10px;padding:14px"
+      >
+
+        <div style="display:flex;justify-content:space-between;gap:10px">
+
+          <div>
+            <b>${esc(lead.name)}</b>
+
+            <div class="muted">
+              ${esc(lead.location || "")}
+            </div>
+
+            ${
+              lead.website
+                ? `<div style="margin-top:5px">
+                    <a href="${esc(lead.website)}"
+                       target="_blank"
+                       rel="noopener noreferrer">
+                      Website
+                    </a>
+                  </div>`
+                : ""
+            }
+
+            ${
+              lead.phone
+                ? `<div class="muted">
+                    ${esc(lead.phone)}
+                  </div>`
+                : ""
+            }
+          </div>
+
+          <div style="text-align:right">
+            <b>${lead.score}/100</b>
+
+            <div class="muted">
+              ${esc(lead.status || "")}
+            </div>
+          </div>
+
+        </div>
+
+        <button
+          class="addDiscovered"
+          data-index="${index}"
+          style="margin-top:10px"
+        >
+          Add Lead
+        </button>
+
+      </div>
+    `).join("")}
+  `;
+
+  document.querySelectorAll(".addDiscovered").forEach(btn => {
+
+    btn.addEventListener("click", () => {
+
+      const lead = leads[Number(btn.dataset.index)];
+
+      addDiscoveredLead(lead);
+
+      btn.textContent = "Added ✓";
+      btn.disabled = true;
+    });
+
+  });
+
+  $("addAllDiscovered")?.addEventListener("click", () => {
+
+    let added = 0;
+
+    leads.forEach(lead => {
+
+      if (addDiscoveredLead(lead)) {
+        added++;
+      }
+
+    });
+
+    render();
+
+    if ($("discoveryStatus")) {
+      $("discoveryStatus").innerHTML =
+        `<div class="success">
+          ${added} new leads added.
+        </div>`;
+    }
+
+  });
+}
+
+/* =========================
    ADD DISCOVERED LEAD
------------------------------ */
+========================= */
 
 function addDiscoveredLead(lead) {
 
-  const exists = state.leads.some(existing => {
+  const duplicate = state.leads.some(existing => {
 
-    const existingName =
-      String(existing.name || "")
-        .toLowerCase()
-        .trim();
+    const sameWebsite =
+      lead.website &&
+      existing.web &&
+      lead.website !== "—" &&
+      existing.web !== "—" &&
+      lead.website.toLowerCase() === existing.web.toLowerCase();
 
-    const newName =
-      String(lead.name || "")
-        .toLowerCase()
-        .trim();
+    const sameName =
+      existing.name &&
+      lead.name &&
+      existing.name.toLowerCase() === lead.name.toLowerCase();
 
-    const existingWeb =
-      String(existing.web || "")
-        .toLowerCase()
-        .trim();
-
-    const newWeb =
-      String(lead.website || "")
-        .toLowerCase()
-        .trim();
-
-
-    return (
-      (newWeb &&
-        newWeb !== "—" &&
-        existingWeb === newWeb)
-      ||
-      existingName === newName
-    );
-
+    return sameWebsite || sameName;
   });
 
+  if (duplicate) return false;
 
-  if (exists) return;
-
-
-  state.leads.unshift({
-
-    id: crypto.randomUUID
-      ? crypto.randomUUID()
-      : Date.now().toString(),
-
+  state.leads.push({
+    id: lead.id || Date.now().toString(),
     name: lead.name,
-
-    location:
-      lead.location || "Unknown",
-
-    web:
-      lead.website || "—",
-
-    score:
-      Number(lead.score) || 50,
-
-    value:
-      Number(lead.value) ||
-      state.settings.standard,
-
-    status:
-      lead.status || "New",
-
-    source:
-      "OpenStreetMap",
-
-    websiteStatus:
-      lead.websiteStatus || "Unknown",
-
-    opportunity:
-      lead.opportunity || "",
-
-    createdAt:
-      new Date().toISOString()
-
+    web: lead.website || "—",
+    location: lead.location || "",
+    phone: lead.phone || "",
+    score: Number(lead.score || 0),
+    status: lead.status || "Warm",
+    value: Number(lead.value || 500),
+    source: lead.source || "Public business listing",
+    opportunity: lead.opportunity || ""
   });
-
 
   saveLeads();
-
   render();
+
+  return true;
 }
 
-
-
-/* -----------------------------
+/* =========================
    RENDER
------------------------------ */
+========================= */
 
 function render() {
 
   const leads = state.leads;
 
+  if ($("total")) {
+    $("total").textContent = leads.length;
+  }
 
-  $("total").textContent =
-    leads.length;
+  if ($("hot")) {
+    $("hot").textContent =
+      leads.filter(x => Number(x.score) >= 75).length;
+  }
 
+  if ($("msgs")) {
+    $("msgs").textContent = leads.length;
+  }
 
-  $("hot").textContent =
-    leads.filter(
-      lead => Number(lead.score) >= 75
-    ).length;
+  if ($("value")) {
 
+    const totalValue = leads.reduce(
+      (sum, lead) => sum + Number(lead.value || 0),
+      0
+    );
 
-  $("msgs").textContent =
-    leads.length;
+    $("value").textContent =
+      "$" + totalValue.toLocaleString();
+  }
 
+  if ($("rows")) {
 
-  $("value").textContent =
-    "$" +
-    leads
-      .reduce(
-        (total, lead) =>
-          total + Number(lead.value || 0),
-        0
-      )
-      .toLocaleString();
-
-
-  $("rows").innerHTML =
-    leads.length
+    $("rows").innerHTML = leads.length
 
       ? leads.map(lead => `
-
         <tr>
 
           <td>
@@ -502,100 +496,61 @@ function render() {
           </td>
 
           <td>
-            ${esc(lead.location || "—")}
-          </td>
-
-          <td>
             ${
-              lead.web &&
-              lead.web !== "—"
-
-                ? `
-                  <a
-                    href="${esc(lead.web)}"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    Website
-                  </a>
-                `
-
+              lead.web && lead.web !== "—"
+                ? `<a href="${esc(lead.web)}"
+                     target="_blank"
+                     rel="noopener noreferrer">
+                     ${esc(lead.web)}
+                   </a>`
                 : "—"
             }
           </td>
 
           <td>
-            ${Number(lead.score)}/100
+            ${Number(lead.score || 0)}/100
           </td>
 
           <td>
-            <span class="status">
-              ${esc(
-                lead.status ||
-                (
-                  lead.score >= 75
-                    ? "Hot"
-                    : "Warm"
-                )
-              )}
-            </span>
+            ${esc(
+              lead.status ||
+              (lead.score >= 75 ? "Hot" : "Warm")
+            )}
           </td>
 
           <td>
-            $${Number(
-              lead.value || 0
-            ).toLocaleString()}
+            $${Number(lead.value || 0).toLocaleString()}
           </td>
 
         </tr>
-
       `).join("")
 
       : `
         <tr>
-          <td
-            colspan="6"
-            class="empty"
-          >
-            No leads yet.
-            Find your first prospects.
+          <td colspan="5" class="empty">
+            No leads yet. Add your first prospect.
           </td>
         </tr>
       `;
+  }
 
+  if ($("out")) {
 
-  $("out").innerHTML =
-
-    leads.length
+    $("out").innerHTML = leads.length
 
       ? leads.map(lead => `
-
         <div class="card outreachcard">
 
-          <b>
-            ${esc(lead.name)}
-          </b>
+          <b>${esc(lead.name)}</b>
 
           <p>
-            Hi ${esc(lead.name)},
-            I came across your business and
-            noticed an opportunity to improve
-            the website experience.
-            I build modern websites and web
-            apps for businesses.
-            If you're open to it, I can send
-            a few specific ideas.
+            Hi ${esc(lead.name)}, I came across your business and noticed
+            an opportunity to improve the website experience. I build
+            modern websites and web apps for businesses. If you're open
+            to it, I can send a few specific ideas.
           </p>
 
-          <small class="muted">
-            Suggested project:
-            $${Number(
-              lead.value || state.settings.standard
-            ).toLocaleString()}
-          </small>
-
         </div>
-
       `).join("")
 
       : `
@@ -603,107 +558,45 @@ function render() {
           No outreach drafts yet.
         </div>
       `;
-
-}
-
-
-
-/* -----------------------------
-   SETTINGS
------------------------------ */
-
-function loadSettings() {
-
-  $("minPrice").value =
-    state.settings.min;
-
-  $("standardPrice").value =
-    state.settings.standard;
-
-  $("customPrice").value =
-    state.settings.custom;
-
-  $("dailyLimit").value =
-    state.settings.daily;
-
-}
-
-
-$("save").onclick = () => {
-
-  state.settings = {
-
-    min:
-      Number($("minPrice").value) || 250,
-
-    standard:
-      Number($("standardPrice").value) || 500,
-
-    custom:
-      Number($("customPrice").value) || 1000,
-
-    daily:
-      Number($("dailyLimit").value) || 20
-
-  };
-
-
-  saveSettings();
-
-  alert(
-    "Settings saved locally."
-  );
-
-  render();
-
-};
-
-
-
-/* -----------------------------
-   PWA INSTALL
------------------------------ */
-
-let deferredPrompt;
-
-
-window.addEventListener(
-  "beforeinstallprompt",
-  event => {
-
-    event.preventDefault();
-
-    deferredPrompt = event;
-
-    $("install")
-      .classList
-      .remove("hidden");
-
   }
-);
+}
 
+/* =========================
+   PWA INSTALL
+========================= */
 
-$("install").onclick = async () => {
+let deferredPrompt = null;
 
-  if (!deferredPrompt) return;
+window.addEventListener("beforeinstallprompt", event => {
 
-  deferredPrompt.prompt();
+  event.preventDefault();
 
-  await deferredPrompt.userChoice;
+  deferredPrompt = event;
 
-  deferredPrompt = null;
+  if ($("install")) {
+    $("install").classList.remove("hidden");
+  }
+});
 
-  $("install")
-    .classList
-    .add("hidden");
+if ($("install")) {
 
-};
+  $("install").addEventListener("click", async () => {
 
+    if (!deferredPrompt) return;
 
+    deferredPrompt.prompt();
 
-/* -----------------------------
+    await deferredPrompt.userChoice;
+
+    deferredPrompt = null;
+
+    $("install").classList.add("hidden");
+  });
+}
+
+/* =========================
    SERVICE WORKER
------------------------------ */
+========================= */
 
 if (
   "serviceWorker" in navigator &&
@@ -712,17 +605,12 @@ if (
 
   navigator.serviceWorker
     .register("./sw.js")
-    .catch(console.error);
-
+    .catch(error => console.error("SW:", error));
 }
 
+/* =========================
+   START APP
+========================= */
 
-
-/* -----------------------------
-   START
------------------------------ */
-
-loadSettings();
-
+createDiscoveryUI();
 render();
-```
