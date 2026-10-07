@@ -10,95 +10,482 @@
 <link rel="stylesheet" href="./style.css">
 <title>AI Client Hunter</title>
 </head>
+
 <body>
+
 <aside>
-  <div class="brand"><b>SX</b><span>Client Hunter<small>AI Sales System</small></span></div>
+
+  <div class="brand">
+    <b>SX</b>
+    <span>
+      Client Hunter
+      <small>AI Sales System</small>
+    </span>
+  </div>
+
   <nav>
     <button class="active" data-page="dashboard">Overview</button>
     <button data-page="leads">Leads</button>
     <button data-page="outreach">Outreach</button>
     <button data-page="settings">Settings</button>
   </nav>
+
   <i>● System ready</i>
+
 </aside>
 
 <main>
+
 <header>
-  <div><small>AI WEB DEVELOPMENT SALES</small><h1 id="title">Overview</h1></div>
-  <div class="actions"><button id="install" class="secondary hidden">Install App</button><button id="add">+ Add Lead</button></div>
+
+  <div>
+    <small>AI WEB DEVELOPMENT SALES</small>
+    <h1 id="title">Overview</h1>
+  </div>
+
+  <div class="actions">
+    <button id="install" class="secondary hidden">
+      Install App
+    </button>
+
+    <button id="add">
+      + Add Lead
+    </button>
+  </div>
+
 </header>
 
+
+<!-- ================= DASHBOARD ================= -->
+
 <section id="dashboard" class="page active">
+
   <div class="hero">
+
     <div>
       <small>YOUR AUTOMATED PIPELINE</small>
-      <h2>Find. Qualify. Reach out.<br><em>Build when they say yes.</em></h2>
-      <p>Track prospects, score opportunities and prepare personalized outreach.</p>
+
+      <h2>
+        Find. Qualify. Reach out.
+        <br>
+        <em>Build when they say yes.</em>
+      </h2>
+
+      <p>
+        Discover prospects, analyze websites and prioritize
+        the businesses most likely to need your services.
+      </p>
     </div>
+
     <strong>AI</strong>
+
   </div>
+
 
   <div class="stats">
-    <article><span>Total Leads</span><b id="total">0</b><small>tracked prospects</small></article>
-    <article><span>Hot Leads</span><b id="hot">0</b><small>high priority</small></article>
-    <article><span>Messages</span><b id="msgs">0</b><small>drafts prepared</small></article>
-    <article><span>Pipeline</span><b id="value">$0</b><small>potential value</small></article>
+
+    <article>
+      <span>Total Leads</span>
+      <b id="total">0</b>
+      <small>tracked prospects</small>
+    </article>
+
+    <article>
+      <span>Hot Leads</span>
+      <b id="hot">0</b>
+      <small>high priority</small>
+    </article>
+
+    <article>
+      <span>Messages</span>
+      <b id="msgs">0</b>
+      <small>drafts prepared</small>
+    </article>
+
+    <article>
+      <span>Pipeline</span>
+      <b id="value">$0</b>
+      <small>potential value</small>
+    </article>
+
   </div>
+
 
   <div class="grid">
-    <div class="card"><div class="cardhead"><h3>How it works</h3><small>4 STEPS</small></div>
-      <div class="step"><b>01</b><span><strong>Discover</strong><br>Bring in prospects from legitimate sources.</span></div>
-      <div class="step"><b>02</b><span><strong>Qualify</strong><br>Score website need, fit and potential.</span></div>
-      <div class="step"><b>03</b><span><strong>Personalize</strong><br>Prepare useful, non-generic outreach.</span></div>
-      <div class="step"><b>04</b><span><strong>Notify</strong><br>Know when a prospect becomes interested.</span></div>
+
+    <div class="card">
+
+      <div class="cardhead">
+        <h3>How it works</h3>
+        <small>5 STEPS</small>
+      </div>
+
+      <div class="step">
+        <b>01</b>
+        <span>
+          <strong>Discover</strong>
+          <br>
+          Find legitimate public business prospects.
+        </span>
+      </div>
+
+      <div class="step">
+        <b>02</b>
+        <span>
+          <strong>Analyze</strong>
+          <br>
+          Check public website and technical signals.
+        </span>
+      </div>
+
+      <div class="step">
+        <b>03</b>
+        <span>
+          <strong>Qualify</strong>
+          <br>
+          Calculate opportunity score and project value.
+        </span>
+      </div>
+
+      <div class="step">
+        <b>04</b>
+        <span>
+          <strong>Personalize</strong>
+          <br>
+          Prepare useful outreach based on findings.
+        </span>
+      </div>
+
+      <div class="step">
+        <b>05</b>
+        <span>
+          <strong>Notify</strong>
+          <br>
+          Track interested prospects.
+        </span>
+      </div>
+
     </div>
-    <div class="card"><div class="cardhead"><h3>Offer</h3><small>USD</small></div>
-      <div class="price"><span>Minimum project</span><b>$250+</b></div>
-      <div class="price"><span>Standard website</span><b>$500</b></div>
-      <div class="price"><span>Custom / AI app</span><b>$1,000+</b></div>
-      <p class="muted">Typical website delivery: 5–7 business days.</p>
+
+
+    <div class="card">
+
+      <div class="cardhead">
+        <h3>Offer</h3>
+        <small>USD</small>
+      </div>
+
+      <div class="price">
+        <span>Minimum project</span>
+        <b>$250+</b>
+      </div>
+
+      <div class="price">
+        <span>Standard website</span>
+        <b>$500</b>
+      </div>
+
+      <div class="price">
+        <span>Custom / AI app</span>
+        <b>$1,000+</b>
+      </div>
+
+      <p class="muted">
+        Typical website delivery: 5–7 business days.
+      </p>
+
     </div>
+
   </div>
+
+
+  <!-- DISCOVERY -->
+
+  <div class="card discovery-card">
+
+    <div class="cardhead">
+
+      <div>
+        <h3>Lead Discovery</h3>
+        <small>PUBLIC BUSINESS DATA</small>
+      </div>
+
+      <button id="discoverBtn">
+        Find New Leads
+      </button>
+
+    </div>
+
+
+    <p class="muted">
+      Search legitimate public business listings for potential
+      website clients.
+    </p>
+
+
+    <div id="discoveryForm" style="display:none;margin-top:18px">
+
+      <input
+        id="discoveryNiche"
+        placeholder="Business type e.g. dentist"
+      >
+
+      <input
+        id="discoveryLocation"
+        placeholder="Location e.g. Los Angeles, USA"
+      >
+
+      <select id="discoveryLimit">
+
+        <option value="5">
+          5 prospects
+        </option>
+
+        <option value="10">
+          10 prospects
+        </option>
+
+        <option value="15">
+          15 prospects
+        </option>
+
+      </select>
+
+      <button id="runDiscovery">
+        Search Prospects
+      </button>
+
+      <div id="discoveryStatus"></div>
+
+      <div id="discoveryResults"></div>
+
+    </div>
+
+  </div>
+
 </section>
+
+
+<!-- ================= LEADS ================= -->
 
 <section id="leads" class="page">
-  <div class="sectionhead"><div><h2>Leads</h2><p>Manage prospects and opportunity scores.</p></div><button class="add">+ Add Lead</button></div>
-  <div class="card tablewrap"><table><thead><tr><th>Business</th><th>Website</th><th>Score</th><th>Status</th><th>Value</th></tr></thead><tbody id="rows"></tbody></table></div>
+
+  <div class="sectionhead">
+
+    <div>
+      <h2>Leads</h2>
+      <p>
+        Analyze prospects and prioritize the strongest opportunities.
+      </p>
+    </div>
+
+    <button class="add">
+      + Add Lead
+    </button>
+
+  </div>
+
+
+  <div class="card tablewrap">
+
+    <table>
+
+      <thead>
+
+        <tr>
+          <th>Business</th>
+          <th>Location</th>
+          <th>Website</th>
+          <th>Score</th>
+          <th>Status</th>
+          <th>Value</th>
+          <th>Action</th>
+        </tr>
+
+      </thead>
+
+      <tbody id="rows"></tbody>
+
+    </table>
+
+  </div>
+
 </section>
+
+
+<!-- ================= OUTREACH ================= -->
 
 <section id="outreach" class="page">
-  <div class="sectionhead"><div><h2>Outreach</h2><p>Personalized drafts for qualified prospects.</p></div></div>
+
+  <div class="sectionhead">
+
+    <div>
+      <h2>Outreach</h2>
+      <p>
+        Personalized drafts for qualified prospects.
+      </p>
+    </div>
+
+  </div>
+
   <div id="out"></div>
+
 </section>
+
+
+<!-- ================= SETTINGS ================= -->
 
 <section id="settings" class="page">
-  <div class="sectionhead"><div><h2>Settings</h2><p>Control your offer and local app preferences.</p></div></div>
-  <div class="card settings">
-    <label>Minimum price<input value="250"></label>
-    <label>Standard price<input value="500"></label>
-    <label>Custom / AI app price<input value="1000"></label>
-    <label>Daily outreach limit<input value="20"></label>
-    <div class="warning">Use official APIs and obey platform rules. No CAPTCHA bypass, login scraping or spam.</div>
-    <button id="save">Save settings</button>
+
+  <div class="sectionhead">
+
+    <div>
+      <h2>Settings</h2>
+      <p>
+        Control your offer and local app preferences.
+      </p>
+    </div>
+
   </div>
+
+
+  <div class="card settings">
+
+    <label>
+      Minimum price
+      <input id="settingMinimum" value="250">
+    </label>
+
+    <label>
+      Standard price
+      <input id="settingStandard" value="500">
+    </label>
+
+    <label>
+      Custom / AI app price
+      <input id="settingCustom" value="1000">
+    </label>
+
+    <label>
+      Daily outreach limit
+      <input id="settingDaily" value="20">
+    </label>
+
+    <div class="warning">
+      Use official APIs and obey platform rules.
+      No CAPTCHA bypass, login scraping or spam.
+    </div>
+
+    <button id="save">
+      Save settings
+    </button>
+
+  </div>
+
 </section>
+
 </main>
 
+
+<!-- ================= ADD LEAD MODAL ================= -->
+
 <div id="modal">
+
   <div class="modalbox">
-    <button id="close" class="x">×</button>
+
+    <button id="close" class="x">
+      ×
+    </button>
+
     <small>NEW PROSPECT</small>
+
     <h2>Add lead</h2>
+
     <form id="form">
-      <input id="business" required placeholder="Business name">
-      <input id="website" placeholder="Website URL">
-      <select id="score"><option value="90">Hot — 90</option><option value="75">Strong — 75</option><option value="55" selected>Warm — 55</option><option value="30">Cold — 30</option></select>
-      <input id="potential" type="number" min="0" value="500" placeholder="Potential value USD">
-      <button>Add lead</button>
+
+      <input
+        id="business"
+        required
+        placeholder="Business name"
+      >
+
+      <input
+        id="website"
+        placeholder="Website URL"
+      >
+
+      <input
+        id="location"
+        placeholder="Location"
+      >
+
+      <select id="score">
+
+        <option value="90">
+          Hot — 90
+        </option>
+
+        <option value="75">
+          Strong — 75
+        </option>
+
+        <option value="55" selected>
+          Warm — 55
+        </option>
+
+        <option value="30">
+          Cold — 30
+        </option>
+
+      </select>
+
+      <input
+        id="potential"
+        type="number"
+        min="0"
+        value="500"
+        placeholder="Potential value USD"
+      >
+
+      <button>
+        Add lead
+      </button>
+
     </form>
+
   </div>
+
 </div>
 
+
+<!-- ================= ANALYSIS MODAL ================= -->
+
+<div id="analysisModal">
+
+  <div class="modalbox analysis-box">
+
+    <button id="closeAnalysis" class="x">
+      ×
+    </button>
+
+    <small>WEBSITE QUALIFICATION</small>
+
+    <h2 id="analysisTitle">
+      Website Analysis
+    </h2>
+
+    <div id="analysisContent">
+      <p class="muted">
+        Analyzing website...
+      </p>
+    </div>
+
+  </div>
+
+</div>
+
+
 <script src="./app.js"></script>
+
 </body>
 </html>
