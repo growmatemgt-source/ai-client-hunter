@@ -1,0 +1,40 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#07090d"><meta name="description" content="AI Client Hunter">
+<link rel="manifest" href="./manifest.json"><link rel="icon" href="./icon.svg"><link rel="stylesheet" href="./style.css">
+<title>AI Client Hunter</title></head><body>
+<aside class="sidebar"><div class="brand"><div class="logo">SX</div><div><b>Client Hunter</b><small>AI SALES SYSTEM</small></div></div>
+<nav><button class="nav active" data-page="dashboard">⌂ <span>Overview</span></button><button class="nav" data-page="leads">◈ <span>Leads</span></button><button class="nav" data-page="outreach">↗ <span>Outreach</span></button><button class="nav" data-page="settings">⚙ <span>Settings</span></button></nav>
+<div class="ready">● System ready</div></aside>
+<main><header><div><small>AI WEB DEVELOPMENT SALES</small><h1 id="pageTitle">Overview</h1></div><div class="actions"><button id="install" class="btn ghost hidden">Install App</button><button id="addLead" class="btn">+ Add Lead</button></div></header>
+
+<section id="dashboard" class="page active">
+<div class="hero"><div><span class="tag">● FREE-FIRST PIPELINE</span><h2>Find clients.<br><em>Build when they say yes.</em></h2><p>Discover legitimate business prospects, qualify their websites and keep your sales pipeline organized.</p><button id="discoverBtn" class="btn">Find New Leads</button></div><div class="orb">AI</div></div>
+<div class="stats"><div><small>Total Leads</small><b id="total">0</b><span>tracked prospects</span></div><div><small>Hot Leads</small><b id="hot">0</b><span>high priority</span></div><div><small>Qualified</small><b id="qualified">0</b><span>website reviewed</span></div><div><small>Pipeline</small><b id="value">$0</b><span>estimated value</span></div></div>
+<div class="two"><div class="card"><div class="cardtop"><div><h3>How it works</h3><small>5 STEPS</small></div></div>
+<div class="step"><i>01</i><p><b>Discover</b><br>Find prospects from legitimate public business data.</p></div>
+<div class="step"><i>02</i><p><b>Analyze</b><br>Check website health, mobile and contact signals.</p></div>
+<div class="step"><i>03</i><p><b>Qualify</b><br>Turn website signals into an opportunity score.</p></div>
+<div class="step"><i>04</i><p><b>Personalize</b><br>Prepare useful, non-generic outreach.</p></div>
+<div class="step"><i>05</i><p><b>Close</b><br>When they reply positively, you build and deliver.</p></div></div>
+<div class="card"><div class="cardtop"><div><h3>Your offer</h3><small>USD</small></div></div>
+<div class="price"><span>Minimum project</span><b>$250+</b></div><div class="price"><span>Standard website</span><b>$500</b></div><div class="price"><span>Custom / AI app</span><b>$1,000+</b></div><p class="muted">Typical website delivery: 5–7 business days.</p></div></div>
+<div class="card quick"><div><small>NEXT ACTION</small><h3>Start with 5 prospects</h3><p>Choose a niche and city, then review the results.</p></div><button id="discoverBtn2" class="btn">Find New Leads</button></div>
+</section>
+
+<section id="leads" class="page"><div class="sectionhead"><div><small>PIPELINE</small><h2>Leads</h2><p>Your saved prospects.</p></div><button id="discoverBtn3" class="btn">+ Find New Leads</button></div>
+<div class="toolbar"><span id="leadCount">0 prospects</span><div><button class="filter active" data-filter="all">All</button><button class="filter" data-filter="hot">Hot</button><button class="filter" data-filter="qualified">Qualified</button></div></div><div id="leadList"></div></section>
+
+<section id="outreach" class="page"><div class="sectionhead"><div><small>MESSAGING</small><h2>Outreach</h2><p>Drafts for qualified prospects.</p></div></div><div id="outreachList"></div></section>
+
+<section id="settings" class="page"><div class="sectionhead"><div><small>CONTROL CENTER</small><h2>Settings</h2><p>Manage your offer and limits.</p></div></div>
+<div class="settingsgrid"><div class="card"><h3>Offer</h3><label>Minimum project<input id="minimum" type="number"></label><label>Standard website<input id="standard" type="number"></label><label>Custom / AI app<input id="custom" type="number"></label><button id="saveSettings" class="btn">Save settings</button></div>
+<div class="card"><h3>Outreach safety</h3><label>Daily outbound limit<input id="daily" type="number" min="1" max="100"></label><div class="notice">Recommended: 20/day, 48h between follow-ups, maximum 2 follow-ups. No CAPTCHA bypass, login scraping or spam.</div><div class="notice">Core discovery and qualification are free-first. Official email/WhatsApp sending needs an approved provider/API.</div></div></div></section>
+</main>
+
+<div id="leadModal" class="modal"><div class="modalbox"><button class="close" data-close="leadModal">×</button><small>NEW PROSPECT</small><h2>Add lead</h2><form id="leadForm"><input id="business" required placeholder="Business name"><input id="website" placeholder="https://example.com"><input id="location" placeholder="City, Country"><select id="score"><option value="90">Hot — 90</option><option value="75">Strong — 75</option><option value="55" selected>Warm — 55</option><option value="30">Cold — 30</option></select><input id="potential" type="number" value="500"><button class="btn full">Add lead</button></form></div></div>
+
+<div id="discoveryModal" class="modal"><div class="modalbox wide"><button class="close" data-close="discoveryModal">×</button><small>LEAD DISCOVERY</small><h2>Find new prospects</h2><p class="muted">Search public business listings. Start with 5.</p><form id="discoveryForm" class="discoverform"><label>Niche<input id="niche" required placeholder="dentist, barber, restaurant"></label><label>Location<input id="searchLocation" required placeholder="Los Angeles, USA"></label><label>Limit<select id="limit"><option>5</option><option>10</option><option>15</option></select></label><button class="btn">Search</button></form><div id="discoveryStatus"></div><div id="discoveryResults"></div></div></div>
+
+<div id="analysisModal" class="modal"><div class="modalbox wide"><button class="close" data-close="analysisModal">×</button><small>WEBSITE QUALIFICATION</small><h2 id="analysisTitle">Website analysis</h2><div id="analysisContent"></div></div></div>
+<div id="toast"></div><script src="./app.js"></script></body></html>
