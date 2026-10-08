@@ -41,7 +41,9 @@ function saveSettings() {
   localStorage.setItem("ach_settings", JSON.stringify(state.settings));
 }
 
-/* ---------------- NAVIGATION ---------------- */
+/* =========================
+   NAVIGATION
+========================= */
 
 document.querySelectorAll("nav button").forEach((button) => {
   button.addEventListener("click", () => {
@@ -67,18 +69,29 @@ document.querySelectorAll("nav button").forEach((button) => {
   });
 });
 
-/* ---------------- ADD LEAD MODAL ---------------- */
+/* =========================
+   ADD LEAD MODAL
+========================= */
 
 function openModal() {
-  if ($("modal")) $("modal").classList.add("show");
+  if ($("modal")) {
+    $("modal").classList.add("show");
+  }
 }
 
 function closeModal() {
-  if ($("modal")) $("modal").classList.remove("show");
+  if ($("modal")) {
+    $("modal").classList.remove("show");
+  }
 }
 
-if ($("add")) $("add").onclick = openModal;
-if ($("close")) $("close").onclick = closeModal;
+if ($("add")) {
+  $("add").onclick = openModal;
+}
+
+if ($("close")) {
+  $("close").onclick = closeModal;
+}
 
 document.querySelectorAll(".add").forEach((button) => {
   button.addEventListener("click", openModal);
@@ -88,28 +101,35 @@ if ($("form")) {
   $("form").onsubmit = (e) => {
     e.preventDefault();
 
+    const score = Number($("score")?.value || 55);
+
     const lead = {
-      id: crypto.randomUUID
-        ? crypto.randomUUID()
-        : Date.now().toString(),
+      id:
+        typeof crypto !== "undefined" && crypto.randomUUID
+          ? crypto.randomUUID()
+          : Date.now().toString(),
 
       name: $("business")?.value.trim() || "Unknown Business",
       location: $("leadLocation")?.value.trim() || "",
       web: $("website")?.value.trim() || "",
-      score: Number($("score")?.value || 55),
-      status: Number($("score")?.value || 55) >= 75
-        ? "Hot"
-        : Number($("score")?.value || 55) >= 55
-          ? "Warm"
-          : "Cold",
+      score,
+      status:
+        score >= 75
+          ? "Hot"
+          : score >= 55
+            ? "Warm"
+            : "Cold",
       value: Number($("potential")?.value || 500),
-      source: "Manual"
+      source: "Manual",
+      analysis: null,
+      analyzedAt: null
     };
 
     state.leads.push(lead);
     saveLeads();
 
     closeModal();
+
     e.target.reset();
 
     if ($("potential")) {
@@ -120,7 +140,9 @@ if ($("form")) {
   };
 }
 
-/* ---------------- DISCOVERY ---------------- */
+/* =========================
+   DISCOVERY ELEMENTS
+========================= */
 
 function getDiscoveryElements() {
   return {
@@ -167,14 +189,20 @@ function scoreClass(score) {
 
 function statusLabel(score, status) {
   if (status) return status;
+
   if (score >= 75) return "Hot";
   if (score >= 55) return "Warm";
+
   return "Cold";
 }
 
 function formatValue(value) {
   return "$" + Number(value || 0).toLocaleString();
 }
+
+/* =========================
+   DISCOVERY RESULTS
+========================= */
 
 function renderDiscoveryResults() {
   const { results } = getDiscoveryElements();
@@ -186,63 +214,92 @@ function renderDiscoveryResults() {
       <div class="discovery-empty">
         <div class="discovery-empty-icon">⌕</div>
         <strong>No prospects yet</strong>
-        <span>Search for a niche and location to discover potential clients.</span>
+        <span>
+          Search for a niche and location to discover potential clients.
+        </span>
       </div>
     `;
+
     return;
   }
 
   results.innerHTML = `
     <div class="discovery-results-head">
+
       <div>
-        <strong>${state.discovery.length} prospects found</strong>
-        <span>Review each prospect before adding it to your pipeline.</span>
+        <strong>
+          ${state.discovery.length} prospects found
+        </strong>
+
+        <span>
+          Review each prospect before adding it to your pipeline.
+        </span>
       </div>
 
-      <button class="add-all-btn" id="addAllDiscovered">
+      <button
+        type="button"
+        class="add-all-btn"
+        id="addAllDiscovered"
+      >
         Add all
       </button>
+
     </div>
 
     <div class="discovery-list">
+
       ${state.discovery.map((lead, index) => {
+
         const score = Number(lead.score || 0);
         const status = statusLabel(score, lead.status);
         const cls = scoreClass(score);
 
         const alreadyAdded = state.leads.some((existing) => {
+
           const sameWebsite =
             lead.website &&
             existing.web &&
             lead.website !== "—" &&
             existing.web !== "—" &&
-            lead.website.replace(/\/$/, "") === existing.web.replace(/\/$/, "");
+            lead.website.replace(/\/$/, "") ===
+              existing.web.replace(/\/$/, "");
 
           const sameName =
             lead.name &&
             existing.name &&
-            lead.name.toLowerCase() === existing.name.toLowerCase();
+            lead.name.toLowerCase() ===
+              existing.name.toLowerCase();
 
           return sameWebsite || sameName;
         });
 
         return `
-          <article class="lead-result-card ${alreadyAdded ? "is-added" : ""}">
+          <article
+            class="lead-result-card ${alreadyAdded ? "is-added" : ""}"
+          >
 
             <div class="lead-result-main">
 
               <div class="lead-result-top">
+
                 <div class="lead-number">
                   ${String(index + 1).padStart(2, "0")}
                 </div>
 
                 <div class="lead-identity">
-                  <h4>${esc(lead.name || "Unknown Business")}</h4>
+
+                  <h4>
+                    ${esc(lead.name || "Unknown Business")}
+                  </h4>
 
                   <div class="lead-meta">
+
                     <span class="meta-location">
                       <span class="meta-icon">⌖</span>
-                      ${esc(lead.location || "Location unavailable")}
+                      ${esc(
+                        lead.location ||
+                        "Location unavailable"
+                      )}
                     </span>
 
                     ${
@@ -258,11 +315,16 @@ function renderDiscoveryResults() {
                           </a>
                         `
                         : `
-                          <span class="meta-muted">No website detected</span>
+                          <span class="meta-muted">
+                            No website detected
+                          </span>
                         `
                     }
+
                   </div>
+
                 </div>
+
               </div>
 
               <div class="lead-result-opportunity">
@@ -284,6 +346,7 @@ function renderDiscoveryResults() {
               </div>
 
               <div class="score-info">
+
                 <span class="lead-status ${cls}">
                   ${esc(status)}
                 </span>
@@ -292,21 +355,30 @@ function renderDiscoveryResults() {
                   ${formatValue(lead.value || 250)}
                 </strong>
 
-                <small>Potential project</small>
+                <small>
+                  Potential project
+                </small>
+
               </div>
 
             </div>
 
             <div class="lead-result-action">
+
               ${
                 alreadyAdded
                   ? `
-                    <button class="added-btn" disabled>
+                    <button
+                      type="button"
+                      class="added-btn"
+                      disabled
+                    >
                       ✓ Added
                     </button>
                   `
                   : `
                     <button
+                      type="button"
                       class="add-lead-btn"
                       data-discovery-index="${index}"
                     >
@@ -314,27 +386,31 @@ function renderDiscoveryResults() {
                     </button>
                   `
               }
+
             </div>
 
           </article>
         `;
       }).join("")}
+
     </div>
   `;
-
-  document.querySelectorAll(".add-lead-btn").forEach((button) => {
-    button.addEventListener("click", () => {
-      const index = Number(button.dataset.discoveryIndex);
-      addDiscoveredLead(index);
-    });
-  });
 
   const addAll = $("addAllDiscovered");
 
   if (addAll) {
-    addAll.onclick = addAllDiscovered;
+    addAll.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+
+      addAllDiscovered();
+    });
   }
 }
+
+/* =========================
+   ADD DISCOVERED LEAD
+========================= */
 
 function addDiscoveredLead(index) {
   const lead = state.discovery[index];
@@ -342,90 +418,148 @@ function addDiscoveredLead(index) {
   if (!lead) return;
 
   const duplicate = state.leads.some((existing) => {
+
     const sameWebsite =
       lead.website &&
       existing.web &&
       lead.website !== "—" &&
       existing.web !== "—" &&
-      lead.website.replace(/\/$/, "") === existing.web.replace(/\/$/, "");
+      lead.website.replace(/\/$/, "") ===
+        existing.web.replace(/\/$/, "");
 
     const sameName =
       lead.name &&
       existing.name &&
-      lead.name.toLowerCase() === existing.name.toLowerCase();
+      lead.name.toLowerCase() ===
+        existing.name.toLowerCase();
 
     return sameWebsite || sameName;
   });
 
   if (duplicate) {
-    render();
+    renderDiscoveryResults();
     return;
   }
 
-  state.leads.push({
-    id: crypto.randomUUID
-      ? crypto.randomUUID()
-      : `${Date.now()}-${index}`,
+  const newLead = {
+    id:
+      typeof crypto !== "undefined" && crypto.randomUUID
+        ? crypto.randomUUID()
+        : `${Date.now()}-${index}`,
 
     name: lead.name || "Unknown Business",
     location: lead.location || "",
     web: lead.website || "",
     score: Number(lead.score || 0),
-    status: lead.status || statusLabel(Number(lead.score || 0)),
+
+    status:
+      lead.status ||
+      statusLabel(Number(lead.score || 0)),
+
     value: Number(lead.value || 250),
-    source: lead.source || "OpenStreetMap",
+
+    source:
+      lead.source ||
+      "OpenStreetMap",
+
     phone: lead.phone || "",
-    opportunity: lead.opportunity || "",
+
+    opportunity:
+      lead.opportunity ||
+      "",
+
     analysis: null,
     analyzedAt: null
-  });
+  };
+
+  state.leads.push(newLead);
 
   saveLeads();
+
   renderDiscoveryResults();
   render();
+
+  setDiscoveryStatus(
+    `${newLead.name} added to your leads.`,
+    "success"
+  );
 }
+
+/* =========================
+   ADD ALL DISCOVERED
+========================= */
 
 function addAllDiscovered() {
   let added = 0;
 
-  state.discovery.forEach((lead) => {
+  state.discovery.forEach((lead, index) => {
+
     const duplicate = state.leads.some((existing) => {
+
       const sameWebsite =
         lead.website &&
         existing.web &&
         lead.website !== "—" &&
         existing.web !== "—" &&
-        lead.website.replace(/\/$/, "") === existing.web.replace(/\/$/, "");
+        lead.website.replace(/\/$/, "") ===
+          existing.web.replace(/\/$/, "");
 
       const sameName =
         lead.name &&
         existing.name &&
-        lead.name.toLowerCase() === existing.name.toLowerCase();
+        lead.name.toLowerCase() ===
+          existing.name.toLowerCase();
 
       return sameWebsite || sameName;
     });
 
-    if (!duplicate) {
-      state.leads.push({
-        id: crypto.randomUUID
+    if (duplicate) return;
+
+    state.leads.push({
+      id:
+        typeof crypto !== "undefined" && crypto.randomUUID
           ? crypto.randomUUID()
-          : `${Date.now()}-${added}`,
+          : `${Date.now()}-${index}`,
 
-        name: lead.name || "Unknown Business",
-        location: lead.location || "",
-        web: lead.website || "",
-        score: Number(lead.score || 0),
-        status: lead.status || statusLabel(Number(lead.score || 0)),
-        value: Number(lead.value || 250),
-        source: lead.source || "OpenStreetMap",
-        phone: lead.phone || "",
-        opportunity: lead.opportunity || "",
-        analysis: null,
-        analyzedAt: null
-      });
+      name:
+        lead.name ||
+        "Unknown Business",
 
-      added++;
-    }
+      location:
+        lead.location ||
+        "",
+
+      web:
+        lead.website ||
+        "",
+
+      score:
+        Number(lead.score || 0),
+
+      status:
+        lead.status ||
+        statusLabel(Number(lead.score || 0)),
+
+      value:
+        Number(lead.value || 250),
+
+      source:
+        lead.source ||
+        "OpenStreetMap",
+
+      phone:
+        lead.phone ||
+        "",
+
+      opportunity:
+        lead.opportunity ||
+        "",
+
+      analysis: null,
+      analyzedAt: null
+    });
+
+    added++;
   });
 
   saveLeads();
@@ -439,24 +573,49 @@ function addAllDiscovered() {
   );
 }
 
+/* =========================
+   DISCOVER LEADS
+========================= */
+
 async function discoverLeads() {
-  const { niche, location, limit } = getDiscoveryElements();
 
-  if (!niche || !location) return;
+  const elements = getDiscoveryElements();
 
-  const nicheValue = niche.value.trim();
-  const locationValue = location.value.trim();
-  const limitValue = Number(limit?.value || 5);
+  const niche = elements.niche;
+  const location = elements.location;
+  const limit = elements.limit;
+
+  if (!niche || !location) {
+    console.error(
+      "Discovery inputs not found in index.html"
+    );
+
+    return;
+  }
+
+  const nicheValue =
+    niche.value.trim();
+
+  const locationValue =
+    location.value.trim();
+
+  const limitValue =
+    Number(limit?.value || 5);
 
   if (!nicheValue || !locationValue) {
+
     setDiscoveryStatus(
       "Enter a business niche and location first.",
       "error"
     );
+
     return;
   }
 
-  setDiscoveryStatus("Searching legitimate public business data...", "loading");
+  setDiscoveryStatus(
+    "Searching legitimate public business data...",
+    "loading"
+  );
 
   const buttons = [
     $("discoverBtn"),
@@ -466,46 +625,79 @@ async function discoverLeads() {
 
   buttons.forEach((button) => {
     button.disabled = true;
-    button.dataset.originalText = button.textContent;
-    button.textContent = "Searching...";
+
+    button.dataset.originalText =
+      button.textContent;
+
+    button.textContent =
+      "Searching...";
   });
 
   try {
-    const response = await fetch("./api/discover", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        niche: nicheValue,
-        location: locationValue,
-        limit: Math.min(Math.max(limitValue, 1), 15)
-      })
-    });
 
-    const raw = await response.text();
+    const response = await fetch(
+      "./api/discover",
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type":
+            "application/json"
+        },
+
+        body: JSON.stringify({
+          niche: nicheValue,
+
+          location:
+            locationValue,
+
+          limit:
+            Math.min(
+              Math.max(
+                limitValue,
+                1
+              ),
+              15
+            )
+        })
+      }
+    );
+
+    const raw =
+      await response.text();
 
     let data;
 
     try {
-      data = JSON.parse(raw);
+
+      data =
+        JSON.parse(raw);
+
     } catch {
+
       throw new Error(
         "The discovery server returned an invalid response."
       );
     }
 
-    if (!response.ok || !data.success) {
+    if (
+      !response.ok ||
+      !data.success
+    ) {
+
       throw new Error(
-        data.error || "Lead discovery failed."
+        data.error ||
+        "Lead discovery failed."
       );
     }
 
-    state.discovery = Array.isArray(data.leads)
-      ? data.leads
-      : [];
+    state.discovery =
+      Array.isArray(data.leads)
+        ? data.leads
+        : [];
 
     saveDiscovery();
+
     renderDiscoveryResults();
 
     setDiscoveryStatus(
@@ -514,69 +706,134 @@ async function discoverLeads() {
     );
 
   } catch (error) {
-    console.error(error);
+
+    console.error(
+      "Discovery error:",
+      error
+    );
 
     setDiscoveryStatus(
-      error.message || "Unable to find leads.",
+      error.message ||
+      "Unable to find leads.",
       "error"
     );
+
   } finally {
+
     buttons.forEach((button) => {
+
       button.disabled = false;
+
       button.textContent =
-        button.dataset.originalText || "Find New Leads";
+        button.dataset.originalText ||
+        "Find New Leads";
     });
   }
 }
 
-["discoverBtn", "discoverBtn2", "searchProspects"].forEach((id) => {
-  const button = $(id);
+/* =========================
+   IMPORTANT:
+   DISCOVERY BUTTON EVENT
+========================= */
 
-  if (button) {
-    button.addEventListener("click", discoverLeads);
+document.addEventListener(
+  "click",
+  (event) => {
+
+    const button =
+      event.target.closest(
+        "#discoverBtn, #discoverBtn2, #searchProspects"
+      );
+
+    if (!button) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    discoverLeads();
   }
-});
+);
 
-/* ---------------- WEBSITE ANALYSIS ---------------- */
+/* =========================
+   WEBSITE ANALYSIS
+========================= */
 
 async function analyzeLead(id) {
-  const lead = state.leads.find((item) => item.id === id);
+
+  const lead =
+    state.leads.find(
+      (item) => item.id === id
+    );
 
   if (!lead) return;
 
   if (!$("analysisModal")) {
-    alert("Analysis panel is not available.");
+
+    alert(
+      "Analysis panel is not available."
+    );
+
     return;
   }
 
-  $("analysisModal").classList.add("show");
+  $("analysisModal")
+    .classList
+    .add("show");
 
   if ($("analysisTitle")) {
+
     $("analysisTitle").textContent =
-      lead.name || "Website Analysis";
+      lead.name ||
+      "Website Analysis";
   }
 
   if ($("analysisContent")) {
+
     $("analysisContent").innerHTML = `
       <div class="analysis-loading">
+
         <div class="analysis-spinner"></div>
-        <strong>Analyzing website...</strong>
-        <span>Checking website structure and conversion signals.</span>
+
+        <strong>
+          Analyzing website...
+        </strong>
+
+        <span>
+          Checking website structure and conversion signals.
+        </span>
+
       </div>
     `;
   }
 
-  if (!lead.web || lead.web === "—") {
+  if (
+    !lead.web ||
+    lead.web === "—"
+  ) {
+
     const fallback = {
-      score: Math.max(Number(lead.score || 0), 55),
+
+      score:
+        Math.max(
+          Number(lead.score || 0),
+          55
+        ),
+
       status: "Warm",
+
       value: 500,
+
       https: false,
+
       reachable: false,
+
       mobile: false,
+
       title: "",
+
       opportunity:
         "No website was detected. This is a direct website-development opportunity.",
+
       reasons: [
         "No website was detected.",
         "A new professional website could create a stronger online presence.",
@@ -584,102 +841,219 @@ async function analyzeLead(id) {
       ]
     };
 
-    lead.analysis = fallback;
-    lead.score = fallback.score;
-    lead.status = fallback.status;
-    lead.value = fallback.value;
+    lead.analysis =
+      fallback;
+
+    lead.score =
+      fallback.score;
+
+    lead.status =
+      fallback.status;
+
+    lead.value =
+      fallback.value;
 
     saveLeads();
-    showAnalysis(fallback);
+
+    showAnalysis(
+      fallback
+    );
+
     render();
+
     return;
   }
 
   try {
-    const response = await fetch("./api/analyze", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        id: lead.id,
-        name: lead.name,
-        website: lead.web
-      })
-    });
 
-    const raw = await response.text();
+    const response =
+      await fetch(
+        "./api/analyze",
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          body: JSON.stringify({
+            id:
+              lead.id,
+
+            name:
+              lead.name,
+
+            website:
+              lead.web
+          })
+        }
+      );
+
+    const raw =
+      await response.text();
 
     let data;
 
     try {
-      data = JSON.parse(raw);
+
+      data =
+        JSON.parse(raw);
+
     } catch {
+
       throw new Error(
         "The analysis server returned an invalid response."
       );
     }
 
-    if (!response.ok || !data.success) {
+    if (
+      !response.ok ||
+      !data.success
+    ) {
+
       throw new Error(
-        data.error || "Website analysis failed."
+        data.error ||
+        "Website analysis failed."
       );
     }
 
-    const analysis = data.analysis;
+    const analysis =
+      data.analysis;
 
-    lead.analysis = analysis;
-    lead.analyzedAt = new Date().toISOString();
-    lead.score = Number(analysis.score || lead.score || 0);
-    lead.status = analysis.status || statusLabel(lead.score);
-    lead.value = Number(analysis.value || lead.value || 250);
+    lead.analysis =
+      analysis;
+
+    lead.analyzedAt =
+      new Date().toISOString();
+
+    lead.score =
+      Number(
+        analysis.score ||
+        lead.score ||
+        0
+      );
+
+    lead.status =
+      analysis.status ||
+      statusLabel(
+        lead.score
+      );
+
+    lead.value =
+      Number(
+        analysis.value ||
+        lead.value ||
+        250
+      );
 
     saveLeads();
 
-    showAnalysis(analysis);
+    showAnalysis(
+      analysis
+    );
+
     render();
 
   } catch (error) {
-    console.error(error);
+
+    console.error(
+      error
+    );
 
     if ($("analysisContent")) {
+
       $("analysisContent").innerHTML = `
         <div class="analysis-error">
-          <strong>Analysis failed</strong>
-          <span>${esc(error.message)}</span>
-          <button onclick="analyzeLead('${esc(id)}')">
+
+          <strong>
+            Analysis failed
+          </strong>
+
+          <span>
+            ${esc(error.message)}
+          </span>
+
+          <button
+            type="button"
+            onclick="analyzeLead('${esc(id)}')"
+          >
             Try again
           </button>
+
         </div>
       `;
     }
   }
 }
 
-window.analyzeLead = analyzeLead;
+window.analyzeLead =
+  analyzeLead;
 
-function showAnalysis(analysis) {
-  if (!$("analysisContent")) return;
+/* =========================
+   SHOW ANALYSIS
+========================= */
 
-  const score = Number(analysis.score || 0);
-  const cls = scoreClass(score);
+function showAnalysis(
+  analysis
+) {
 
-  const reasons = Array.isArray(analysis.reasons)
-    ? analysis.reasons
-    : [];
+  if (!$("analysisContent"))
+    return;
+
+  const score =
+    Number(
+      analysis.score || 0
+    );
+
+  const cls =
+    scoreClass(score);
+
+  const reasons =
+    Array.isArray(
+      analysis.reasons
+    )
+      ? analysis.reasons
+      : [];
 
   $("analysisContent").innerHTML = `
+
     <div class="analysis-summary">
 
-      <div class="analysis-score ${cls}">
-        <strong>${score}</strong>
-        <span>/100</span>
-        <b>${esc(analysis.status || statusLabel(score))}</b>
+      <div
+        class="analysis-score ${cls}"
+      >
+
+        <strong>
+          ${score}
+        </strong>
+
+        <span>
+          /100
+        </span>
+
+        <b>
+          ${esc(
+            analysis.status ||
+            statusLabel(score)
+          )}
+        </b>
+
       </div>
 
       <div class="analysis-value">
-        <small>Recommended project</small>
-        <strong>${formatValue(analysis.value || 250)}</strong>
+
+        <small>
+          Recommended project
+        </small>
+
+        <strong>
+          ${formatValue(
+            analysis.value ||
+            250
+          )}
+        </strong>
+
       </div>
 
     </div>
@@ -688,46 +1062,95 @@ function showAnalysis(analysis) {
 
       <div>
         <span>HTTPS</span>
-        <strong>${analysis.https ? "✓ Yes" : "✕ No"}</strong>
+        <strong>
+          ${
+            analysis.https
+              ? "✓ Yes"
+              : "✕ No"
+          }
+        </strong>
       </div>
 
       <div>
-        <span>Website reachable</span>
-        <strong>${analysis.reachable ? "✓ Yes" : "✕ No"}</strong>
+        <span>
+          Website reachable
+        </span>
+
+        <strong>
+          ${
+            analysis.reachable
+              ? "✓ Yes"
+              : "✕ No"
+          }
+        </strong>
       </div>
 
       <div>
-        <span>Mobile viewport</span>
-        <strong>${analysis.mobile ? "✓ Detected" : "✕ Missing"}</strong>
+        <span>
+          Mobile viewport
+        </span>
+
+        <strong>
+          ${
+            analysis.mobile
+              ? "✓ Detected"
+              : "✕ Missing"
+          }
+        </strong>
       </div>
 
       <div>
-        <span>Page title</span>
-        <strong>${analysis.title ? "✓ Detected" : "✕ Missing"}</strong>
+        <span>
+          Page title
+        </span>
+
+        <strong>
+          ${
+            analysis.title
+              ? "✓ Detected"
+              : "✕ Missing"
+          }
+        </strong>
       </div>
 
     </div>
 
     <div class="analysis-section">
-      <small>OPPORTUNITY</small>
+
+      <small>
+        OPPORTUNITY
+      </small>
+
       <p>
         ${esc(
           analysis.opportunity ||
           "Look for specific business and conversion improvements before outreach."
         )}
       </p>
+
     </div>
 
     ${
       reasons.length
         ? `
           <div class="analysis-section">
-            <small>REASONS</small>
+
+            <small>
+              REASONS
+            </small>
+
             <ul>
-              ${reasons.map((reason) => `
-                <li>${esc(reason)}</li>
-              `).join("")}
+
+              ${reasons.map(
+                (reason) => `
+                  <li>
+                    ${esc(reason)}
+                  </li>
+                `
+              ).join("")}
+
             </ul>
+
           </div>
         `
         : ""
@@ -735,207 +1158,371 @@ function showAnalysis(analysis) {
   `;
 }
 
+/* =========================
+   CLOSE ANALYSIS
+========================= */
+
 if ($("closeAnalysis")) {
-  $("closeAnalysis").onclick = () => {
-    $("analysisModal").classList.remove("show");
-  };
+
+  $("closeAnalysis").onclick =
+    () => {
+
+      if ($("analysisModal")) {
+
+        $("analysisModal")
+          .classList
+          .remove("show");
+      }
+    };
 }
 
-/* ---------------- MAIN RENDER ---------------- */
+/* =========================
+   MAIN RENDER
+========================= */
 
 function render() {
-  const leads = state.leads;
+
+  const leads =
+    state.leads;
 
   if ($("total")) {
-    $("total").textContent = leads.length;
+
+    $("total").textContent =
+      leads.length;
   }
 
   if ($("hot")) {
+
     $("hot").textContent =
-      leads.filter((lead) => Number(lead.score || 0) >= 75).length;
+      leads.filter(
+        (lead) =>
+          Number(
+            lead.score || 0
+          ) >= 75
+      ).length;
   }
 
   if ($("msgs")) {
-    $("msgs").textContent = leads.length;
+
+    $("msgs").textContent =
+      leads.length;
   }
 
   if ($("value")) {
-    const totalValue = leads.reduce(
-      (sum, lead) => sum + Number(lead.value || 0),
-      0
-    );
+
+    const totalValue =
+      leads.reduce(
+        (sum, lead) =>
+          sum +
+          Number(
+            lead.value || 0
+          ),
+        0
+      );
 
     $("value").textContent =
-      "$" + totalValue.toLocaleString();
+      "$" +
+      totalValue.toLocaleString();
   }
 
   if ($("rows")) {
-    $("rows").innerHTML = leads.length
-      ? leads.map((lead) => {
-          const score = Number(lead.score || 0);
-          const cls = scoreClass(score);
 
-          return `
-            <tr>
-              <td>
-                <b>${esc(lead.name)}</b>
-              </td>
+    $("rows").innerHTML =
+      leads.length
+        ? leads.map(
+            (lead) => {
 
-              <td>
-                <span class="lead-location-cell">
-                  ${esc(lead.location || "—")}
-                </span>
-              </td>
+              const score =
+                Number(
+                  lead.score || 0
+                );
 
-              <td>
-                ${
-                  lead.web
-                    ? `
-                      <a
-                        href="${esc(lead.web)}"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        Website
-                      </a>
-                    `
-                    : "—"
-                }
-              </td>
+              const cls =
+                scoreClass(
+                  score
+                );
 
-              <td>
-                <strong>${score}/100</strong>
-              </td>
+              return `
+                <tr>
 
-              <td>
-                <span class="table-status ${cls}">
-                  ${esc(lead.status || statusLabel(score))}
-                </span>
-              </td>
+                  <td>
+                    <b>
+                      ${esc(
+                        lead.name
+                      )}
+                    </b>
+                  </td>
 
-              <td>
-                $${Number(lead.value || 0).toLocaleString()}
-              </td>
+                  <td>
+                    <span
+                      class="lead-location-cell"
+                    >
+                      ${esc(
+                        lead.location ||
+                        "—"
+                      )}
+                    </span>
+                  </td>
 
-              <td>
-                <button
-                  class="table-analyze-btn"
-                  onclick="analyzeLead('${esc(lead.id)}')"
-                >
-                  ${lead.analysis ? "Re-analyze" : "Analyze"}
-                </button>
-              </td>
-            </tr>
-          `;
-        }).join("")
-      : `
-        <tr>
-          <td colspan="7" class="empty">
-            No leads yet. Discover your first prospects.
-          </td>
-        </tr>
-      `;
+                  <td>
+
+                    ${
+                      lead.web
+                        ? `
+                          <a
+                            href="${esc(
+                              lead.web
+                            )}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            Website
+                          </a>
+                        `
+                        : "—"
+                    }
+
+                  </td>
+
+                  <td>
+                    <strong>
+                      ${score}/100
+                    </strong>
+                  </td>
+
+                  <td>
+
+                    <span
+                      class="table-status ${cls}"
+                    >
+                      ${esc(
+                        lead.status ||
+                        statusLabel(score)
+                      )}
+                    </span>
+
+                  </td>
+
+                  <td>
+                    $${Number(
+                      lead.value || 0
+                    ).toLocaleString()}
+                  </td>
+
+                  <td>
+
+                    <button
+                      type="button"
+                      class="table-analyze-btn"
+                      onclick="analyzeLead('${esc(
+                        lead.id
+                      )}')"
+                    >
+                      ${
+                        lead.analysis
+                          ? "Re-analyze"
+                          : "Analyze"
+                      }
+                    </button>
+
+                  </td>
+
+                </tr>
+              `;
+            }
+          ).join("")
+        : `
+          <tr>
+
+            <td
+              colspan="7"
+              class="empty"
+            >
+              No leads yet.
+              Discover your first prospects.
+            </td>
+
+          </tr>
+        `;
   }
 
   if ($("out")) {
-    const qualified = leads.filter(
-      (lead) => Number(lead.score || 0) >= 55
-    );
 
-    $("out").innerHTML = qualified.length
-      ? qualified.map((lead) => `
-          <div class="card outreachcard">
-            <b>${esc(lead.name)}</b>
-            <p>
-              Hi ${esc(lead.name)}, I came across your business and noticed
-              an opportunity to improve the website experience. I build
-              modern websites and web apps for businesses. If you're open
-              to it, I can send a few specific ideas.
-            </p>
+    const qualified =
+      leads.filter(
+        (lead) =>
+          Number(
+            lead.score || 0
+          ) >= 55
+      );
+
+    $("out").innerHTML =
+      qualified.length
+        ? qualified.map(
+            (lead) => `
+              <div
+                class="card outreachcard"
+              >
+
+                <b>
+                  ${esc(
+                    lead.name
+                  )}
+                </b>
+
+                <p>
+                  Hi ${esc(
+                    lead.name
+                  )}, I came across your business and noticed an opportunity to improve the website experience. I build modern websites and web apps for businesses. If you're open to it, I can send a few specific ideas.
+                </p>
+
+              </div>
+            `
+          ).join("")
+        : `
+          <div
+            class="card empty"
+          >
+            Analyze and qualify leads
+            to prepare outreach drafts.
           </div>
-        `).join("")
-      : `
-        <div class="card empty">
-          Analyze and qualify leads to prepare outreach drafts.
-        </div>
-      `;
+        `;
   }
 
   renderDiscoveryResults();
 }
 
-/* ---------------- SETTINGS ---------------- */
+/* =========================
+   SETTINGS
+========================= */
 
 function loadSettings() {
+
   if ($("settingMinimum")) {
-    $("settingMinimum").value = state.settings.minimum;
+    $("settingMinimum").value =
+      state.settings.minimum;
   }
 
   if ($("settingStandard")) {
-    $("settingStandard").value = state.settings.standard;
+    $("settingStandard").value =
+      state.settings.standard;
   }
 
   if ($("settingCustom")) {
-    $("settingCustom").value = state.settings.custom;
+    $("settingCustom").value =
+      state.settings.custom;
   }
 
   if ($("settingDaily")) {
-    $("settingDaily").value = state.settings.daily;
+    $("settingDaily").value =
+      state.settings.daily;
   }
 }
 
 if ($("save")) {
-  $("save").onclick = () => {
-    state.settings = {
-      minimum: Number($("settingMinimum")?.value || 250),
-      standard: Number($("settingStandard")?.value || 500),
-      custom: Number($("settingCustom")?.value || 1000),
-      daily: Number($("settingDaily")?.value || 20)
+
+  $("save").onclick =
+    () => {
+
+      state.settings = {
+
+        minimum:
+          Number(
+            $("settingMinimum")?.value ||
+            250
+          ),
+
+        standard:
+          Number(
+            $("settingStandard")?.value ||
+            500
+          ),
+
+        custom:
+          Number(
+            $("settingCustom")?.value ||
+            1000
+          ),
+
+        daily:
+          Number(
+            $("settingDaily")?.value ||
+            20
+          )
+      };
+
+      saveSettings();
+
+      alert(
+        "Settings saved locally."
+      );
     };
-
-    saveSettings();
-
-    alert("Settings saved locally.");
-  };
 }
 
-/* ---------------- PWA ---------------- */
+/* =========================
+   PWA INSTALL
+========================= */
 
-let deferredPrompt = null;
+let deferredPrompt =
+  null;
 
-window.addEventListener("beforeinstallprompt", (event) => {
-  event.preventDefault();
+window.addEventListener(
+  "beforeinstallprompt",
+  (event) => {
 
-  deferredPrompt = event;
+    event.preventDefault();
 
-  if ($("install")) {
-    $("install").classList.remove("hidden");
+    deferredPrompt =
+      event;
+
+    if ($("install")) {
+      $("install")
+        .classList
+        .remove("hidden");
+    }
   }
-});
+);
 
 if ($("install")) {
-  $("install").onclick = async () => {
-    if (!deferredPrompt) return;
 
-    deferredPrompt.prompt();
+  $("install").onclick =
+    async () => {
 
-    await deferredPrompt.userChoice;
+      if (!deferredPrompt)
+        return;
 
-    deferredPrompt = null;
-    $("install").classList.add("hidden");
-  };
+      deferredPrompt.prompt();
+
+      await deferredPrompt.userChoice;
+
+      deferredPrompt =
+        null;
+
+      $("install")
+        .classList
+        .add("hidden");
+    };
 }
+
+/* =========================
+   SERVICE WORKER
+========================= */
 
 if (
   "serviceWorker" in navigator &&
   location.protocol !== "file:"
 ) {
+
   navigator.serviceWorker
     .register("./sw.js")
-    .catch(console.error);
+    .catch(
+      console.error
+    );
 }
 
-/* ---------------- INITIAL LOAD ---------------- */
+/* =========================
+   INITIAL LOAD
+========================= */
 
 loadSettings();
 render();
