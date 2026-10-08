@@ -1,0 +1,1 @@
+let leads=[];export default function handler(req,res){if(req.method==="GET")return res.status(200).json(leads);if(req.method==="POST"){leads.push(req.body||{});return res.status(201).json({success:true});}return res.status(405).json({error:"Method not allowed"});}
